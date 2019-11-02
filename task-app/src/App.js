@@ -56,9 +56,9 @@ class App extends React.Component {
 
         <section className="topics">
           <ul>
-            <li>
+            <li className={"has" + this.state.hasTasks}>
                 <h2>to do</h2>
-                <ul id="to-do" className={"itens has" + this.state.hasTasks}>
+                <ul id="to-do" className="itens">
                     {this.state.tasks.map((task, index) => {
                       return (
                         <li key={task}>
@@ -69,9 +69,9 @@ class App extends React.Component {
                       })}
                 </ul>
             </li>
-            <li>
+            <li className={"has" + this.state.hasDoing}>
                 <h2>doing</h2>
-                <ul id="doing" className={"itens has" + this.state.hasDoing}>
+                <ul id="doing" className="itens">
                     {this.state.tDoing.map((task, index) => {
                       return (<li key={task}>
                         <p>{task}</p>
@@ -81,9 +81,9 @@ class App extends React.Component {
                     })}
                 </ul>
             </li>
-            <li>
+            <li className={"has" + this.state.hasDone}>
                 <h2>done</h2>
-                <ul id="done" className={"itens has" + this.state.hasDone}>
+                <ul id="done" className="itens">
                     {this.state.tDone.map((task, index) => {
                       return (
                         <li key={task}>

@@ -98,3 +98,6 @@ header #buttonAdd {
     margin-left: 5px;
 }
 
+.topics ul .has0{
+    display: none;
+}
