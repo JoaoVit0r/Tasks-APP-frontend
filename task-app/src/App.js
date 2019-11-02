@@ -5,17 +5,41 @@ import './css/style.css';
 class App extends React.Component {
   constructor(){
     super();
+
     this.state = {
       task: "",
       tasks: [],
       tDoing: [],
       tDone: [],
+      hasTasks: 0,
+      hasDoing: 0,
+      hasDone: 0,
     };
 
+    this.complete = this.complete.bind(this);
     this.moveDone = this.moveDone.bind(this);
     this.moveDoing = this.moveDoing.bind(this);
     this.addTask = this.addTask.bind(this);
     this.updateInput = this.updateInput.bind(this);
+    this.load = this.load.bind(this);
+  }
+  
+  componentWillMount(){
+    localStorage.getItem("listTodo") && this.setState({
+      tasks: JSON.parse(localStorage.getItem("listTodo"))
+    })
+    localStorage.getItem("listDoing") && this.setState({
+      tDoing: JSON.parse(localStorage.getItem("listDoing"))
+    })
+    localStorage.getItem("listDone") && this.setState({
+      tDone: JSON.parse(localStorage.getItem("listDone"))
+    })
+  }
+
+  componentWillUpdate(nextProps, nextState){
+    localStorage.setItem("listTodo", JSON.stringify(nextState.tasks));
+    localStorage.setItem("listDoing", JSON.stringify(nextState.tDoing));
+    localStorage.setItem("listDone", JSON.stringify(nextState.tDone));
   }
   
   render(){
@@ -34,37 +58,40 @@ class App extends React.Component {
           <ul>
             <li>
                 <h2>to do</h2>
-                <ul id="to-do" className="itens">
-                    {this.state.tasks.map((task, index) => (
+                <ul id="to-do" className={"itens has" + this.state.hasTasks}>
+                    {this.state.tasks.map((task, index) => {
+                      return (
                         <li key={task}>
                             <p>{task}</p>
                             <button className="fas fa-chevron-circle-right" 
                               onClick={() => this.moveDoing(index)}></button>
-                        </li>
-                    ))}
+                        </li>)
+                      })}
                 </ul>
             </li>
             <li>
                 <h2>doing</h2>
-                <ul className="itens">
-                    {this.state.tDoing.map((task) => (
-                        <li key={task}>
-                            <p>{task}</p>
-                            <button className="fas fa-chevron-circle-right" ></button>
-                        </li>
-                    ))}
+                <ul id="doing" className={"itens has" + this.state.hasDoing}>
+                    {this.state.tDoing.map((task, index) => {
+                      return (<li key={task}>
+                        <p>{task}</p>
+                        <button className="fas fa-chevron-circle-right" 
+                              onClick={() => this.moveDone(index)}></button>
+                      </li>);
+                    })}
                 </ul>
             </li>
             <li>
                 <h2>done</h2>
-                <ul id="done" className="itens">
-                    {this.state.tDone.map((task, index) => (
+                <ul id="done" className={"itens has" + this.state.hasDone}>
+                    {this.state.tDone.map((task, index) => {
+                      return (
                         <li key={task}>
                             <p>{task}</p>
-                            <button className="fas fa-chevron-circle-right" 
-                              onClick={() => this.moveDoing(index)}></button>
-                        </li>
-                    ))}
+                            <button className="fas fa-times-circle" 
+                              onClick={() => this.complete(index)}></button>
+                        </li>)
+                    })}
                 </ul>
             </li>
           </ul>
@@ -72,33 +99,58 @@ class App extends React.Component {
       </div>
     );
   }
-  moveDone(){
-    this.setState({ 
-      done: [].concat(this.state.done, this.state.doing.pop() )
+
+  complete(index){
+    this.setState({
+      tDone: this.state.tDone.filter((element)=>(
+        !(element===this.state.tDone[index]))),
+      hasDone: this.state.hasDone -1,
+    });
+  }
+
+  moveDone(index){
+    this.setState({
+      tDoing: this.state.tDoing.filter((element)=>(
+                      !(element===this.state.tDoing[index])
+              )),
+      hasDoing: this.state.hasDoing -1,
+      tDone: [].concat(this.state.tDone, this.state.tDoing[index] ),
+      hasDone: this.state.hasDone +1,
     });
   }
 
   moveDoing(index){
-    console.log(index);
-    console.log(this.state.tasks);
-    console.log(this.state.tasks.slice(index,1) );
     this.setState({ 
-      doing : this.state.doing.push(this.state.tasks.slice(index,1) )
+      tasks: this.state.tasks.filter((element)=>(
+                      !(element===this.state.tasks[index])
+              )),
+              
+      hasTasks: this.state.hasTasks -1,
+      tDoing : [].concat(this.state.tDoing, this.state.tasks[index]),
+      hasDoing: this.state.hasDoing +1,
     });
-    
-    console.log(this.state.tasks);
-    console.log(this.state.tasks.slice(index,1) );
   }
 
   addTask(){
-    this.setState({ 
-      task : "",
-      tasks : [].concat(this.state.tasks, this.state.task ),
-    });
+    if(this.state.task!==""){
+      this.setState({ 
+        task : "",
+        tasks : [].concat(this.state.tasks, this.state.task ),
+        hasTasks: this.state.hasTasks +1,
+      });
+    }
   }
 
   updateInput(event){
     this.setState({task: event.target.value})
+  }
+
+  load(){
+    this.setState({
+      tasks: localStorage.getItem('listToDo'),
+      tDoing: localStorage.getItem('listDoing'),
+      tDone: localStorage.getItem('listDone'),
+    })
   }
 }
 
