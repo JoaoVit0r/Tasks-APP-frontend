@@ -1,29 +1,28 @@
 import React from 'react';
-import '../css/style.css'
-import '../css/all.css';
 
 class List extends React.Component{
 
-    constructor(){
-        super();
+    constructor(props){
+        super(props);
         this.state = {
-            lista: "To Do",
-            task: "",
+            tasks: [],
         };
     }
 
     render(){
-        const tasks = ["task 1", "tasks 2"];
         return(
             <li>
-                <h2>{this.state.lista}</h2>
-                <ul id="to-do" class="itens">
-                    {tasks.map(task => (
-                    <li>{ task }</li>
-                    ) )}
+                <h2>{this.props.titulo}</h2>
+                <ul id="to-do" className="itens">
+                    {this.props.tarefas.map((task,index) => (
+                        <li key={task}>
+                            <p>{task}</p>
+                            <button className={this.props.namebt} onClick={() => (this.props.func(index))}></button>
+                        </li>
+                    ))}
                 </ul>
             </li>
-        );
+        )
     }
 }
 export default List;
