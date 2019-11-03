@@ -21,18 +21,21 @@ class App extends React.Component {
     this.moveDoing = this.moveDoing.bind(this);
     this.addTask = this.addTask.bind(this);
     this.updateInput = this.updateInput.bind(this);
-    this.load = this.load.bind(this);
+    this.load =this.load.bind(this);
   }
   
   componentWillMount(){
     localStorage.getItem("listTodo") && this.setState({
-      tasks: JSON.parse(localStorage.getItem("listTodo"))
+      tasks: JSON.parse(localStorage.getItem("listTodo")),
+      hasTasks: localStorage.getItem("listTodo").length
     })
     localStorage.getItem("listDoing") && this.setState({
-      tDoing: JSON.parse(localStorage.getItem("listDoing"))
+      tDoing: JSON.parse(localStorage.getItem("listDoing")),
+      hasDoing: localStorage.getItem("listDoing").length
     })
     localStorage.getItem("listDone") && this.setState({
-      tDone: JSON.parse(localStorage.getItem("listDone"))
+      tDone: JSON.parse(localStorage.getItem("listDone")),
+      hasDone: localStorage.getItem("listDone").length
     })
     localStorage.getItem("numTasks") && this.setState({
       hasTasks: JSON.parse(localStorage.getItem("numTasks"))
@@ -74,10 +77,12 @@ class App extends React.Component {
                 <ul id="to-do" className="itens">
                     {this.state.tasks.map((task, index) => {
                       return (
-                        <li key={task}>
+                        <li key={index}>
                             <p>{task}</p>
                             <button className="fas fa-chevron-circle-right" 
-                              onClick={() => this.moveDoing(index)}></button>
+                              onClick={() => {return(
+                                this.moveDoing(index),
+                               this.load)}}></button>
                         </li>)
                       })}
                 </ul>
@@ -86,10 +91,11 @@ class App extends React.Component {
                 <h2>doing</h2>
                 <ul id="doing" className="itens">
                     {this.state.tDoing.map((task, index) => {
-                      return (<li key={task}>
+                      return (<li key={index}>
                         <p>{task}</p>
                         <button className="fas fa-chevron-circle-right" 
-                              onClick={() => this.moveDone(index)}></button>
+                              onClick={() => {return(this.moveDone(index),
+                                this.load)}}></button>
                       </li>);
                     })}
                 </ul>
@@ -99,10 +105,11 @@ class App extends React.Component {
                 <ul id="done" className="itens">
                     {this.state.tDone.map((task, index) => {
                       return (
-                        <li key={task}>
+                        <li key={index}>
                             <p>{task}</p>
                             <button className="fas fa-times-circle" 
-                              onClick={() => this.complete(index)}></button>
+                              onClick={() =>{return(this.complete(index),
+                                this.load)}}></button>
                         </li>)
                     })}
                 </ul>
@@ -117,8 +124,11 @@ class App extends React.Component {
     this.setState({
       tDone: this.state.tDone.filter((element)=>(
         !(element===this.state.tDone[index]))),
-      hasDone: this.state.hasDone -1,
+      //hasDone: this.state.hasDone -1,
     });
+    this.setState({
+      hasDone: this.state.tDone.length,
+    })
   }
 
   moveDone(index){
@@ -126,10 +136,14 @@ class App extends React.Component {
       tDoing: this.state.tDoing.filter((element)=>(
                       !(element===this.state.tDoing[index])
               )),
-      hasDoing: this.state.hasDoing -1,
+      //hasDoing: this.state.tDoing.length,
       tDone: [].concat(this.state.tDone, this.state.tDoing[index] ),
-      hasDone: this.state.hasDone +1,
+      //hasDone: this.state.hasDone +1,
     });
+    this.setState({
+      hasDoing: this.state.tDoing.length,
+      hasDone: this.state.tDone.length,
+    })
   }
 
   moveDoing(index){
@@ -138,10 +152,14 @@ class App extends React.Component {
                       !(element===this.state.tasks[index])
               )),
               
-      hasTasks: this.state.hasTasks -1,
+      //hasTasks: this.state.hasTasks -1,
       tDoing : [].concat(this.state.tDoing, this.state.tasks[index]),
-      hasDoing: this.state.hasDoing +1,
+      //hasDoing:,
     });
+    this.setState({
+      hasTasks: this.state.tasks.length,
+      hasDoing: this.state.tDoing.length
+    })
   }
 
   addTask(){
@@ -149,8 +167,11 @@ class App extends React.Component {
       this.setState({ 
         task : "",
         tasks : [].concat(this.state.tasks, this.state.task ),
-        hasTasks: this.state.hasTasks +1,
+        //hasTasks: this.state.hasTasks +1,
       });
+      this.setState({
+        hasTasks: this.state.tasks.length
+      })
     }
   }
 
@@ -160,9 +181,9 @@ class App extends React.Component {
 
   load(){
     this.setState({
-      tasks: localStorage.getItem('listToDo'),
-      tDoing: localStorage.getItem('listDoing'),
-      tDone: localStorage.getItem('listDone'),
+      hasTasks: this.state.tasks.length,
+      hasDoing: this.state.tDoing.length,
+      hasDone: this.state.tDone.length,
     })
   }
 }
