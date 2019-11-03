@@ -21,21 +21,17 @@ class App extends React.Component {
     this.moveDoing = this.moveDoing.bind(this);
     this.addTask = this.addTask.bind(this);
     this.updateInput = this.updateInput.bind(this);
-    this.load =this.load.bind(this);
   }
   
-  componentWillMount(){
+  componentDidMount(){
     localStorage.getItem("listTodo") && this.setState({
       tasks: JSON.parse(localStorage.getItem("listTodo")),
-      hasTasks: localStorage.getItem("listTodo").length
     })
     localStorage.getItem("listDoing") && this.setState({
       tDoing: JSON.parse(localStorage.getItem("listDoing")),
-      hasDoing: localStorage.getItem("listDoing").length
     })
     localStorage.getItem("listDone") && this.setState({
       tDone: JSON.parse(localStorage.getItem("listDone")),
-      hasDone: localStorage.getItem("listDone").length
     })
     localStorage.getItem("numTasks") && this.setState({
       hasTasks: JSON.parse(localStorage.getItem("numTasks"))
@@ -48,14 +44,13 @@ class App extends React.Component {
     })
   }
 
-  componentWillUpdate(nextProps, nextState){
-    localStorage.setItem("listTodo", JSON.stringify(nextState.tasks));
-    localStorage.setItem("listDoing", JSON.stringify(nextState.tDoing));
-    localStorage.setItem("listDone", JSON.stringify(nextState.tDone));
-    localStorage.setItem("numTasks", JSON.stringify(nextState.hasTasks));
-    localStorage.setItem("numDoing", JSON.stringify(nextState.hasDoing));
-    localStorage.setItem("numDone", JSON.stringify(nextState.hasDone));
-
+  save(tasks,tDoing,tDone,hasTasks,hasDoing,hasDone){
+    localStorage.setItem("listTodo", JSON.stringify(tasks));
+    localStorage.setItem("listDoing", JSON.stringify(tDoing));
+    localStorage.setItem("listDone", JSON.stringify(tDone));
+    localStorage.setItem("numTasks", JSON.stringify(hasTasks));
+    localStorage.setItem("numDoing", JSON.stringify(hasDoing));
+    localStorage.setItem("numDone", JSON.stringify(hasDone));
   }
   
   render(){
@@ -80,9 +75,7 @@ class App extends React.Component {
                         <li key={index}>
                             <p>{task}</p>
                             <button className="fas fa-chevron-circle-right" 
-                              onClick={() => {return(
-                                this.moveDoing(index),
-                               this.load)}}></button>
+                              onClick={() =>this.moveDoing(index)}></button>
                         </li>)
                       })}
                 </ul>
@@ -94,8 +87,7 @@ class App extends React.Component {
                       return (<li key={index}>
                         <p>{task}</p>
                         <button className="fas fa-chevron-circle-right" 
-                              onClick={() => {return(this.moveDone(index),
-                                this.load)}}></button>
+                              onClick={() => this.moveDone(index)}></button>
                       </li>);
                     })}
                 </ul>
@@ -108,8 +100,7 @@ class App extends React.Component {
                         <li key={index}>
                             <p>{task}</p>
                             <button className="fas fa-times-circle" 
-                              onClick={() =>{return(this.complete(index),
-                                this.load)}}></button>
+                              onClick={() =>this.complete(index)}></button>
                         </li>)
                     })}
                 </ul>
@@ -121,70 +112,57 @@ class App extends React.Component {
   }
 
   complete(index){
+    const {tasks,tDoing,tDone,hasTasks,hasDoing} = this.state;
+    const newDone = tDone.filter((element)=>(!(element===tDone[index])))
     this.setState({
-      tDone: this.state.tDone.filter((element)=>(
-        !(element===this.state.tDone[index]))),
-      //hasDone: this.state.hasDone -1,
+      tDone: newDone,
+      hasDone: newDone.length,
     });
-    this.setState({
-      hasDone: this.state.tDone.length,
-    })
+    this.save(tasks,tDoing,newDone,hasTasks,hasDoing,newDone.length);
   }
 
   moveDone(index){
+    const {tasks,tDoing,tDone,hasTasks} = this.state;
+    const newDoing = tDoing.filter((element)=>(!(element===tDoing[index])));
+    const newDone = [].concat(tDone, tDoing[index]);
     this.setState({
-      tDoing: this.state.tDoing.filter((element)=>(
-                      !(element===this.state.tDoing[index])
-              )),
-      //hasDoing: this.state.tDoing.length,
-      tDone: [].concat(this.state.tDone, this.state.tDoing[index] ),
-      //hasDone: this.state.hasDone +1,
+      tDoing: newDoing,
+      hasDoing: newDoing.length,
+      tDone: newDone,
+      hasDone: newDone.length,
     });
-    this.setState({
-      hasDoing: this.state.tDoing.length,
-      hasDone: this.state.tDone.length,
-    })
+    this.save(tasks,newDoing,newDone,hasTasks,newDoing.length,newDone.length);
   }
 
   moveDoing(index){
+    const {tasks,tDoing,tDone,hasDone} = this.state;
+    const newTasks = tasks.filter((element)=>(!(element===tasks[index])));
+    const newDoing = [].concat(tDoing, tasks[index]);
     this.setState({ 
-      tasks: this.state.tasks.filter((element)=>(
-                      !(element===this.state.tasks[index])
-              )),
-              
-      //hasTasks: this.state.hasTasks -1,
-      tDoing : [].concat(this.state.tDoing, this.state.tasks[index]),
-      //hasDoing:,
+      tasks: newTasks,
+      hasTasks: newTasks.length,
+      tDoing : newDoing,
+      hasDoing: newDoing.length,
     });
-    this.setState({
-      hasTasks: this.state.tasks.length,
-      hasDoing: this.state.tDoing.length
-    })
+    this.save(newTasks,newDoing,tDone,newTasks.length,newDoing.length,hasDone);
   }
 
   addTask(){
-    if(this.state.task!==""){
-      this.setState({ 
-        task : "",
-        tasks : [].concat(this.state.tasks, this.state.task ),
-        //hasTasks: this.state.hasTasks +1,
-      });
+    const {task,tasks,tDoing,tDone,hasDoing,hasDone} = this.state;
+
+    const newTasks = [].concat(tasks, task);
+    if(task!==""){
       this.setState({
-        hasTasks: this.state.tasks.length
-      })
+        tasks : newTasks,
+        task : "",
+        hasTasks: newTasks.length,
+      });
+      this.save(newTasks,tDoing,tDone,newTasks.length,hasDoing,hasDone);
     }
   }
 
   updateInput(event){
     this.setState({task: event.target.value})
-  }
-
-  load(){
-    this.setState({
-      hasTasks: this.state.tasks.length,
-      hasDoing: this.state.tDoing.length,
-      hasDone: this.state.tDone.length,
-    })
   }
 }
 
