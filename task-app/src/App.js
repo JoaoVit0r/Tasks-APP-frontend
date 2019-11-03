@@ -34,12 +34,25 @@ class App extends React.Component {
     localStorage.getItem("listDone") && this.setState({
       tDone: JSON.parse(localStorage.getItem("listDone"))
     })
+    localStorage.getItem("numTasks") && this.setState({
+      hasTasks: JSON.parse(localStorage.getItem("numTasks"))
+    })
+    localStorage.getItem("numDoing") && this.setState({
+      hasDoing: JSON.parse(localStorage.getItem("numDoing"))
+    })
+    localStorage.getItem("numDone") && this.setState({
+      hasDone: JSON.parse(localStorage.getItem("numDone"))
+    })
   }
 
   componentWillUpdate(nextProps, nextState){
     localStorage.setItem("listTodo", JSON.stringify(nextState.tasks));
     localStorage.setItem("listDoing", JSON.stringify(nextState.tDoing));
     localStorage.setItem("listDone", JSON.stringify(nextState.tDone));
+    localStorage.setItem("numTasks", JSON.stringify(nextState.hasTasks));
+    localStorage.setItem("numDoing", JSON.stringify(nextState.hasDoing));
+    localStorage.setItem("numDone", JSON.stringify(nextState.hasDone));
+
   }
   
   render(){
